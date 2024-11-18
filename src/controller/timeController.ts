@@ -42,7 +42,7 @@ export const readTimes = async (req: FastifyRequest, res: FastifyReply) => {
     try {
 
         const result = await db.query(
-            'SELECT * FROM time WHERE  id = $1 '
+            'SELECT * FROM time'
         )
 
         if (result.rows.length === 0) {
@@ -110,7 +110,7 @@ export const deleteTime = async (req: FastifyRequest, res: FastifyReply) => {
         const { id } = timeSchema.parse(req.body)
 
         const result = await db.query(
-            'DELETE FROM time WHERE id = $1 RETURNING *',
+            'DELETE FROM time WHERE id = $1',
             [id]
         )
 
