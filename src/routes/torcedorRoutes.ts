@@ -3,9 +3,9 @@ import { createTorcedor, deleteTorcedor, readTorcedores, readTorcedorId, updateT
 
 export async function torcedorRoutes(app:FastifyInstance) {
     
-    app.post("/torcedor", createTorcedor)// Criar um novo torcedor
-    app.get("/torcedor", readTorcedores)// Listar todos os torcedor
-    app.get("torcedor/:id", readTorcedorId)// Obter um torcedor específico
+    app.post("/torcedor/new", createTorcedor)// Criar um novo torcedor
+    app.get("/torcedores", readTorcedores)// Listar todos os torcedor
+    app.get("/torcedor/:id", readTorcedorId)// Obter um torcedor específico
     app.put("/torcedor/:id",updateTorcedor)// Atualizar um torcedor
     app.delete("/torcedor/:id", deleteTorcedor)//deletar um torcedor
 }

@@ -51,7 +51,8 @@ export const readTimes = async (req: FastifyRequest, res: FastifyReply) => {
 
         return res.status(200).send(result.rows)
     } catch (error) {
-
+        console.error(error);
+        return res.status(500).send({ error: "Erro ao tentar buscar os times." });
     }
 }
 // obter um time em expecifico 
