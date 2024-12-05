@@ -1,11 +1,29 @@
 import { FastifyInstance } from "fastify";
-import { createTorcedor, deleteTorcedor, readTorcedores, readTorcedorId, updateTorcedor } from "../controller/torcedorController";
+import {
+    createTorcedor,
+    deleteTorcedor,
+    readTorcedores,
+    readTorcedoresByTime,
+    readTorcedorId,
+    updateTorcedor
+} from "../controller/torcedorController";
 
-export async function torcedorRoutes(app:FastifyInstance) {
-    
-    app.post("/torcedor/new", createTorcedor)// Criar um novo torcedor
-    app.get("/torcedores", readTorcedores)// Listar todos os torcedor
-    app.get("/torcedor/:id", readTorcedorId)// Obter um torcedor específico
-    app.put("/torcedor/:id",updateTorcedor)// Atualizar um torcedor
-    app.delete("/torcedor/:id", deleteTorcedor)//deletar um torcedor
+export async function torcedorRoutes(app: FastifyInstance) {
+    // Criar um novo torcedor
+    app.post("/torcedor/new", createTorcedor);
+
+    // Listar todos os torcedores
+    app.get("/torcedores", readTorcedores);
+
+    // Obter um torcedor específico pelo ID
+    app.get("/torcedor/:id", readTorcedorId);
+
+    // Atualizar um torcedor específico pelo ID
+    app.put("/torcedor/:id", updateTorcedor);
+
+    // Deletar um torcedor específico pelo ID
+    app.delete("/torcedor/:id", deleteTorcedor);
+
+    // Obter todos os torcedores de um time específico
+    app.get('/torcedor/time/:time', readTorcedoresByTime);
 }

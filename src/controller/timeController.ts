@@ -5,25 +5,29 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 
 import { timeSchema } from '../models/timeSchema';
 
+const removeAccents = (str: String) => {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+};
+
 export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
+
     try {
         const { nome, localizacao } = timeSchema.parse(req.body)
+        const nometimeMinusculo = removeAccents(nome).toLowerCase();
+        const localizacaoNormalizado = removeAccents(localizacao).toLowerCase();
 
-        // verificando se o time ja foi cadastrado
         const timeCadastrado = await db.query(
             'SELECT EXISTS(SELECT 1 FROM "time" WHERE nome = $1)'
-            , [nome]
+            , [nometimeMinusculo]
         )
         const timeExists = timeCadastrado.rows[0].exists;
-        //se for verdadeiro retorna um error dizendo que ja foi cadastrado
         if (timeExists) {
             return res.status(400).send({ error: 'Já existe um time com esse nome' });
         }
 
-        //inserindo os dados do time no DB
         const result = await db.query(
             'INSERT INTO "time"(nome,localizacao) VALUES ($1, $2) RETURNING id'
-            , [nome, localizacao]
+            , [nometimeMinusculo, localizacaoNormalizado]
         )
 
         return res.status(201).send({ message: 'Torcedor cadastrado com sucesso!' })
@@ -37,7 +41,7 @@ export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
         }
     }
 }
-//obter todos os times
+
 export const readTimes = async (req: FastifyRequest, res: FastifyReply) => {
     try {
 
@@ -55,39 +59,54 @@ export const readTimes = async (req: FastifyRequest, res: FastifyReply) => {
         return res.status(500).send({ error: "Erro ao tentar buscar os times." });
     }
 }
-// obter um time em expecifico 
+
 export const readTimeId = async (req: FastifyRequest, res: FastifyReply) => {
+    const timeParamsSchema = z.object({
+        id: z.string().transform((val) => parseInt(val, 10)), 
+    });
     try {
-        const { id } = timeSchema.parse(req.body)
+        
+        const { id } = timeParamsSchema.parse(req.params);  
 
+        
         const result = await db.query(
-            'SELECT * FROM time WHERE  id = $1 ',
+            'SELECT * FROM time WHERE id = $1',
             [id]
-        )
+        );
 
+        
         if (result.rows.length === 0) {
-            return res.status(404).send({ error: "time não encontrado" })
+            return res.status(404).send({ error: 'Time não encontrado' });
         }
 
-        return res.status(200).send(result.rows[0])
+        return res.status(200).send(result.rows[0]);
+
     } catch (error) {
+
         if (error instanceof z.ZodError) {
-            res.status(400).send({ error: error.errors });
+            return res.status(400).send({ error: error.errors });
         } else {
+
             console.error('Erro no servidor:', error);
-            res.status(500).send({ error: 'Erro no servidor' });
+            return res.status(500).send({ error: 'Erro no servidor' });
         }
     }
+};
 
-}
-//atualizar um time em especifico
 export const updateTime = async (req: FastifyRequest, res: FastifyReply) => {
+    const timeParamsSchema = z.object({
+        id: z.string().transform(Number),
+    });
     try {
-        const { id, nome, localizacao } = timeSchema.parse(req.body)
+        const { id } = timeParamsSchema.parse(req.params);
+        const {nome, localizacao } = timeSchema.parse(req.body)
+
+        const nometimeMinusculo = removeAccents(nome).toLowerCase();
+        const localizacaoNormalizado = removeAccents(localizacao).toLowerCase();
 
         const result = await db.query(
             'UPDATE "time" SET nome = $1, localizacao = $2 WHERE id = $3 RETURNING *',
-            [nome, localizacao, id]
+            [nometimeMinusculo, localizacaoNormalizado, id]
         )
 
         if (result.rows.length === 0) {
@@ -105,28 +124,43 @@ export const updateTime = async (req: FastifyRequest, res: FastifyReply) => {
     }
 }
 
-//deletar um time
 export const deleteTime = async (req: FastifyRequest, res: FastifyReply) => {
+    const timeParamsSchema = z.object({
+        id: z.string().transform(Number),
+    });
     try {
-        const { id } = timeSchema.parse(req.body)
-
-        const result = await db.query(
-            'DELETE FROM time WHERE id = $1',
+        const { id } = timeParamsSchema.parse(req.params); 
+        
+        // Deleta as associações na tabela timetorcedor
+        await db.query(
+            'DELETE FROM timetorcedor WHERE idtime = $1',
             [id]
-        )
+        );
 
+        // Deleta os torcedores associados ao time
+        await db.query(
+            'DELETE FROM torcedor WHERE id IN (SELECT idtorcedor FROM timetorcedor WHERE idtime = $1)',
+            [id]
+        );
+
+        // Deleta o time
+        const result = await db.query(
+            'DELETE FROM time WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        // Verificar se o time foi realmente deletado
         if (result.rows.length === 0) {
-            return res.status(404).send("Time não encontrado ou ja foi deletado")
+            return res.status(404).send("Time não encontrado ou já foi deletado");
         }
+
         res.send({ message: 'Time deletado com sucesso!' });
 
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            res.status(400).send({ error: error.errors });
-        } else {
-            console.error('Erro no servidor:', error);
-            res.status(500).send({ error: 'Erro no servidor' });
-        }
+        console.error('Erro no servidor:', error);
+        res.status(500).send({ error: 'Erro no servidor' });
     }
-}
+};
+
+
 

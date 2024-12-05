@@ -6,6 +6,7 @@ import { timeRoutes } from "./routes/timeRoutes";
 
 export const app = fastify();
 
+
 app.register(fastifyCors, {
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
