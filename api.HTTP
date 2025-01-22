@@ -1,1 +1,11 @@
-GET http://localhost:8888/time/3
+GET http://localhost:8888/time/2
+
+###
+POST http://localhost:8888/time/new
+Content-Type: application/json
+
+{
+    "nome": "Volta Redonda", 
+    "localizacao":"Rio de janeiro", 
+    "serie": "B"
+}

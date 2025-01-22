@@ -4,7 +4,9 @@ import fastify from "fastify";
 import { torcedorRoutes } from "./routes/torcedorRoutes"
 import { timeRoutes } from "./routes/timeRoutes";
 
-export const app = fastify();
+export const app = fastify(({
+    logger: true
+}));
 
 
 app.register(fastifyCors, {

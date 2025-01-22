@@ -30,7 +30,7 @@ export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
             , [nometimeMinusculo, localizacaoNormalizado, serie]
         )
 
-        return res.status(201).send({ message: 'Torcedor cadastrado com sucesso!' })
+        return res.status(201).send({ message: 'Time cadastrado com sucesso!' })
 
     } catch (error) {
         if (error instanceof z.ZodError) {
@@ -105,7 +105,7 @@ export const updateTime = async (req: FastifyRequest, res: FastifyReply) => {
         const localizacaoNormalizado = removeAccents(localizacao).toLowerCase();
 
         const result = await db.query(
-            'UPDATE "time" SET nome = $1, localizacao = $2 serie =$3 WHERE id = $4 RETURNING *',
+            'UPDATE "time" SET nome = $1, localizacao = $2 serie =$3 WHERE id = $3 RETURNING *',
             [nometimeMinusculo, localizacaoNormalizado, serie, id]
         )
 
