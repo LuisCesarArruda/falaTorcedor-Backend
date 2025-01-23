@@ -1,11 +1,26 @@
-GET http://localhost:8888/time/2
+GET http://localhost:8888/time/3
 
 ###
 POST http://localhost:8888/time/new
 Content-Type: application/json
 
 {
-    "nome": "Volta Redonda", 
-    "localizacao":"Rio de janeiro", 
-    "serie": "B"
+    "nome": "Santos", 
+    "localizacao":"São Paulo", 
+    "serie": "A"
+}
+###
+GET http://localhost:8888/torcedor/time/santos
+
+###
+GET http://localhost:8888/times
+
+###
+PUT http://localhost:8888/time/3
+Content-Type: application/json
+
+{
+    "nome": "Santos A", 
+    "localizacao":"São Paulo", 
+    "Divisao": "A"
 }

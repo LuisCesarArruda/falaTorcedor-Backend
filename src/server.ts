@@ -5,7 +5,17 @@ import { torcedorRoutes } from "./routes/torcedorRoutes"
 import { timeRoutes } from "./routes/timeRoutes";
 
 export const app = fastify(({
-    logger: true
+    logger: {
+        transport: {
+            target: "pino-pretty", // Usa o pino-pretty para formatar logs
+            options: {
+                colorize: true,        // Adiciona cores ao log (útil para terminais)
+                translateTime: "HH:MM:ss", // Formata a data/hora
+                ignore: "pid,hostname", // Remove campos desnecessários como PID e hostname
+                singleLine: true,      // Mantém o log em uma única linha (opcional)
+            },
+        },
+    },
 }));
 
 

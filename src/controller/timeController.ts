@@ -12,7 +12,7 @@ const removeAccents = (str: String) => {
 export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
 
     try {
-        const { nome, localizacao, serie } = timeSchema.parse(req.body)
+        const { nome, localizacao, divisao } = timeSchema.parse(req.body)
         const nometimeMinusculo = removeAccents(nome).toLowerCase();
         const localizacaoNormalizado = removeAccents(localizacao).toLowerCase();
 
@@ -26,8 +26,8 @@ export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
         }
 
         const result = await db.query(
-            'INSERT INTO "time"(nome,localizacao, serie) VALUES ($1, $2,$3) RETURNING id'
-            , [nometimeMinusculo, localizacaoNormalizado, serie]
+            'INSERT INTO "time"(nome,localizacao, divisao) VALUES ($1, $2,$3) RETURNING id'
+            , [nometimeMinusculo, localizacaoNormalizado, divisao]
         )
 
         return res.status(201).send({ message: 'Time cadastrado com sucesso!' })
@@ -99,14 +99,14 @@ export const updateTime = async (req: FastifyRequest, res: FastifyReply) => {
     });
     try {
         const { id } = timeParamsSchema.parse(req.params);
-        const {nome, localizacao,serie } = timeSchema.parse(req.body)
+        const {nome, localizacao,divisao } = timeSchema.parse(req.body)
 
         const nometimeMinusculo = removeAccents(nome).toLowerCase();
         const localizacaoNormalizado = removeAccents(localizacao).toLowerCase();
 
         const result = await db.query(
-            'UPDATE "time" SET nome = $1, localizacao = $2 serie =$3 WHERE id = $3 RETURNING *',
-            [nometimeMinusculo, localizacaoNormalizado, serie, id]
+            'UPDATE "time" SET nome = $1, localizacao = $2, divisao = $3 WHERE id = $4 RETURNING *',
+            [nometimeMinusculo, localizacaoNormalizado, divisao, id]
         )
 
         if (result.rows.length === 0) {
