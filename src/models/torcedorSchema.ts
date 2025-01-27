@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export const torcedorSchema = z.object({
     id: z.number().optional(),

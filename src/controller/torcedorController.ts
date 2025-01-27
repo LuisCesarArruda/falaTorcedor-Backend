@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { db } from '../utils/db';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { FastifyReply, FastifyRequest } from 'fastify';
+
 
 import { torcedorSchema } from '../models/torcedorSchema';
 
@@ -126,8 +126,8 @@ export const readTorcedorId = async (req: FastifyRequest, res: FastifyReply) => 
         id: z.string().transform((val) => parseInt(val, 10)), // Converte a string para um número inteiro
     });
     try {
-        
-        const { id } = idSchema.parse(req.params); 
+
+        const { id } = idSchema.parse(req.params);
 
 
         // Fazendo a consulta no banco de dados

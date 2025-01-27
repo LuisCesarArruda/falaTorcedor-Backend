@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { db } from '../utils/db';
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import {FastifyReply, FastifyRequest } from 'fastify';
+
 
 import { timeSchema } from '../models/timeSchema';
 
-const removeAccents = (str: String) => {
+const removeAccents = (str: string) => {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 };
 
@@ -25,7 +25,7 @@ export const createTime = async (req: FastifyRequest, res: FastifyReply) => {
             return res.status(400).send({ error: 'Já existe um time com esse nome' });
         }
 
-        const result = await db.query(
+        await db.query(
             'INSERT INTO "time"(nome,localizacao, divisao) VALUES ($1, $2,$3) RETURNING id'
             , [nometimeMinusculo, localizacaoNormalizado, divisao]
         )
@@ -62,19 +62,19 @@ export const readTimes = async (req: FastifyRequest, res: FastifyReply) => {
 
 export const readTimeId = async (req: FastifyRequest, res: FastifyReply) => {
     const timeParamsSchema = z.object({
-        id: z.string().transform((val) => parseInt(val, 10)), 
+        id: z.string().transform((val) => parseInt(val, 10)),
     });
     try {
-        
-        const { id } = timeParamsSchema.parse(req.params);  
 
-        
+        const { id } = timeParamsSchema.parse(req.params);
+
+
         const result = await db.query(
             'SELECT * FROM time WHERE id = $1',
             [id]
         );
 
-        
+
         if (result.rows.length === 0) {
             return res.status(404).send({ error: 'Time não encontrado' });
         }
@@ -129,8 +129,8 @@ export const deleteTime = async (req: FastifyRequest, res: FastifyReply) => {
         id: z.string().transform(Number),
     });
     try {
-        const { id } = timeParamsSchema.parse(req.params); 
-        
+        const { id } = timeParamsSchema.parse(req.params);
+
         // Deleta as associações na tabela timetorcedor
         await db.query(
             'DELETE FROM timetorcedor WHERE idtime = $1',
